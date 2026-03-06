@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Platform, Linking, Alert } from 'react-native';
 import { Session, Prayer } from '../types';
 
 const CHANNEL_ID = 'prayer-reminders';
@@ -30,10 +30,36 @@ export async function setupNotifications(): Promise<void> {
 // ── Permissions ───────────────────────────────────────────────────────────────
 
 export async function requestPermissions(): Promise<boolean> {
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  if (existing === 'granted') return true;
-  const { status } = await Notifications.requestPermissionsAsync();
-  return status === 'granted';
+  const perms = await Notifications.getPermissionsAsync();
+
+  let granted = perms.granted;
+  if (!granted) {
+    const result = await Notifications.requestPermissionsAsync();
+    granted = result.granted;
+  }
+
+  if (!granted) return false;
+
+  // Android 12+ (API 31+): SCHEDULE_EXACT_ALARM requires explicit user grant
+  // in Settings → Special app access → Alarms & reminders
+  if (Platform.OS === 'android' && Platform.Version >= 31) {
+    const canScheduleExact = (perms as any).android?.canScheduleExactAlarms ?? true;
+    if (!canScheduleExact) {
+      Alert.alert(
+        'Notificações na hora exacta',
+        'Para receber os lembretes de oração exactamente à hora marcada, activa "Alarmes e lembretes" para Devotio nas Definições do Android.',
+        [
+          { text: 'Mais tarde', style: 'cancel' },
+          {
+            text: 'Abrir Definições',
+            onPress: () => Linking.openSettings(),
+          },
+        ]
+      );
+    }
+  }
+
+  return granted;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

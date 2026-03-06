@@ -11,7 +11,6 @@ import {
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Prayer } from '../types';
-import { seedPrayers } from '../data/seedPrayers';
 
 export function usePrayers() {
   const { user } = useAuth();
@@ -23,21 +22,18 @@ export function usePrayers() {
 
     const ref = collection(db, 'users', user.uid, 'prayers');
     const q   = query(ref, orderBy('createdAt', 'asc'));
-    let seeded = false;
 
-    const unsubscribe = onSnapshot(q, async (snap) => {
-      if (snap.empty && !seeded) {
-        seeded = true;
-        await Promise.all(
-          seedPrayers.map((p) =>
-            setDoc(doc(ref, p.id), { ...p, createdAt: Date.now() })
-          )
-        );
-        return; // next snapshot will contain the seeded data
+    const unsubscribe = onSnapshot(
+      q,
+      (snap) => {
+        setPrayers(snap.docs.map((d) => d.data() as Prayer));
+        setLoading(false);
+      },
+      (error) => {
+        console.error('[usePrayers] Firestore error:', error.code, error.message);
+        setLoading(false);
       }
-      setPrayers(snap.docs.map((d) => d.data() as Prayer));
-      setLoading(false);
-    });
+    );
 
     return unsubscribe;
   }, [user]);
@@ -47,6 +43,15 @@ export function usePrayers() {
     const id  = `custom_${Date.now()}`;
     const ref = doc(db, 'users', user.uid, 'prayers', id);
     await setDoc(ref, { ...prayer, id, createdAt: Date.now() });
+  }
+
+  async function addPreloadedPrayer(prayer: Prayer) {
+    if (!user) return;
+    // Check not already added
+    const alreadyAdded = prayers.some((p) => p.id === prayer.id);
+    if (alreadyAdded) return;
+    const ref = doc(db, 'users', user.uid, 'prayers', prayer.id);
+    await setDoc(ref, { ...prayer, createdAt: Date.now() });
   }
 
   async function updatePrayer(id: string, updates: Partial<Omit<Prayer, 'id' | 'createdAt'>>) {
@@ -60,5 +65,5 @@ export function usePrayers() {
     await deleteDoc(doc(db, 'users', user.uid, 'prayers', id));
   }
 
-  return { prayers, loading, addPrayer, updatePrayer, deletePrayer };
+  return { prayers, loading, addPrayer, addPreloadedPrayer, updatePrayer, deletePrayer };
 }

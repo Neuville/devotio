@@ -76,8 +76,9 @@ export default function AddEditPrayerScreen() {
         await addPrayer({ title: title.trim(), body: body.trim(), tags, isPreloaded: false });
       }
       navigation.goBack();
-    } catch {
-      Alert.alert('Erro', 'Não foi possível guardar a oração. Tente novamente.');
+    } catch (e: any) {
+      console.error('[AddEditPrayer] save error:', e.code, e.message);
+      Alert.alert('Erro', `Não foi possível guardar a oração.\n\n${e.code ?? e.message}`);
     } finally {
       setSaving(false);
     }

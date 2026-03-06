@@ -24,7 +24,7 @@ export interface Session {
   customUnit: CustomUnit;    // used when recurrence === 'custom'
   daysOfWeek: number[];      // 0=Sun … 6=Sat, used when recurrence === 'weekly'
   prayerItems: PrayerItem[]; // ordered, with quantity per prayer
-  notificationId: string;
+  notificationIds: string[];  // one per scheduled notification (weekly can have multiple)
   isActive: boolean;
   createdAt: number;         // epoch ms
 }

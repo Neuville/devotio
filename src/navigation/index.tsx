@@ -12,6 +12,7 @@ import ScheduleStack  from './ScheduleStack';
 import HomeScreen     from '../screens/HomeScreen';
 import ProfileScreen  from '../screens/ProfileScreen';
 import { RootTabParamList } from './types';
+import { navigationRef } from './navigationRef';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -88,7 +89,7 @@ export default function Navigation() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {user ? <MainTabs /> : <AuthStack />}
     </NavigationContainer>
   );

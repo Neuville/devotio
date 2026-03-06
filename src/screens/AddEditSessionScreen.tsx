@@ -25,6 +25,10 @@ import { ScheduleStackParamList } from '../navigation/types';
 import { useSessions } from '../hooks/useSessions';
 import { usePrayers } from '../hooks/usePrayers';
 import { PrayerItem, Recurrence, CustomUnit } from '../types';
+import {
+  scheduleSessionNotifications,
+  cancelNotifications,
+} from '../services/notifications';
 
 type Route = RouteProp<ScheduleStackParamList, 'AddEditSession'>;
 type Nav   = StackNavigationProp<ScheduleStackParamList, 'AddEditSession'>;
@@ -161,10 +165,13 @@ export default function AddEditSessionScreen() {
       return;
     }
 
-    const time = timeFromDate(timeDate);
-    const autoName = name.trim() || `Oração das ${time}`;
+    const time      = timeFromDate(timeDate);
+    const autoName  = name.trim() || `Oração das ${time}`;
+    const newId     = sessionId ?? `session_${Date.now()}`;
+    const isActive  = existing?.isActive ?? true;
 
-    const payload = {
+    const sessionData = {
+      id:             newId,
       name:           autoName,
       time,
       recurrence,
@@ -172,16 +179,30 @@ export default function AddEditSessionScreen() {
       customUnit,
       daysOfWeek:     recurrence === 'weekly' ? [...daysOfWeek].sort() : [],
       prayerItems,
-      isActive:       existing?.isActive ?? true,
+      isActive,
+      notificationIds: [] as string[],
     };
 
     setSaving(true);
     try {
-      if (isEdit && sessionId) {
-        await updateSession(sessionId, payload);
-      } else {
-        await addSession(payload);
+      // Cancel old notifications when editing
+      if (isEdit && existing?.notificationIds?.length) {
+        await cancelNotifications(existing.notificationIds);
       }
+
+      // Schedule new notifications (include prayer titles for rich body)
+      const notificationIds = isActive
+        ? await scheduleSessionNotifications(sessionData, prayers)
+        : [];
+
+      const fullSession = { ...sessionData, notificationIds };
+
+      if (isEdit) {
+        await updateSession(newId, fullSession);
+      } else {
+        await addSession(fullSession);
+      }
+
       navigation.goBack();
     } catch (e: any) {
       console.error('[AddEditSession] save error:', e.code, e.message);

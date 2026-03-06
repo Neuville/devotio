@@ -6,6 +6,7 @@ export type AuthStackParamList = {
 
 export type NotebookStackParamList = {
   NotebookHome:  undefined;
+  PrayerDetail:  { prayerId: string };
   AddEditPrayer: { prayerId?: string }; // undefined = new prayer
 };
 

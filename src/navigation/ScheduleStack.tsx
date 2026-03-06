@@ -3,7 +3,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { ScheduleStackParamList } from './types';
 import ScheduleScreen      from '../screens/ScheduleScreen';
 import AddEditSessionScreen from '../screens/AddEditSessionScreen';
-import PrayerPickerScreen  from '../screens/PrayerPickerScreen';
 
 const Stack = createStackNavigator<ScheduleStackParamList>();
 
@@ -12,7 +11,6 @@ export default function ScheduleStack() {
     <Stack.Navigator screenOptions={{ headerShown: false, animation: 'default' }}>
       <Stack.Screen name="ScheduleHome"   component={ScheduleScreen} />
       <Stack.Screen name="AddEditSession" component={AddEditSessionScreen} />
-      <Stack.Screen name="PrayerPicker"   component={PrayerPickerScreen} />
     </Stack.Navigator>
   );
 }

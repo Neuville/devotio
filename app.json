@@ -43,7 +43,8 @@
         {
           "color": "#B8860B"
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "scheme": "devotio"
   }

@@ -11,9 +11,8 @@ export type NotebookStackParamList = {
 };
 
 export type ScheduleStackParamList = {
-  ScheduleHome:    undefined;
-  AddEditSession:  { sessionId?: string };
-  PrayerPicker:    { selectedIds: string[]; onDone: (ids: string[]) => void };
+  ScheduleHome:   undefined;
+  AddEditSession: { sessionId?: string };
 };
 
 export type RootTabParamList = {

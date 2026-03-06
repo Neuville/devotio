@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius } from '../constants/theme';
 import { NotebookStackParamList } from '../navigation/types';
@@ -25,6 +26,7 @@ type Nav = StackNavigationProp<NotebookStackParamList, 'NotebookHome'>;
 
 export default function NotebookScreen() {
   const insets                                          = useSafeAreaInsets();
+  const tabBarHeight                                    = useBottomTabBarHeight();
   const navigation                                      = useNavigation<Nav>();
   const { prayers, loading, deletePrayer,
           addPreloadedPrayer }                          = usePrayers();
@@ -132,14 +134,14 @@ export default function NotebookScreen() {
           contentContainerStyle={[
             styles.listContent,
             prayers.length === 0 && styles.listContentEmpty,
-            { paddingBottom: insets.bottom + 90 },
+            { paddingBottom: tabBarHeight + spacing.md },
           ]}
           showsVerticalScrollIndicator={false}
         />
       )}
 
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 72 }]}
+        style={[styles.fab, { bottom: tabBarHeight + spacing.md }]}
         onPress={() => setShowOptions(true)}
         activeOpacity={0.85}
       >

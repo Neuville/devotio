@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius } from '../constants/theme';
 import { NotebookStackParamList } from '../navigation/types';
@@ -20,9 +21,10 @@ type Route = RouteProp<NotebookStackParamList, 'PrayerDetail'>;
 type Nav   = StackNavigationProp<NotebookStackParamList, 'PrayerDetail'>;
 
 export default function PrayerDetailScreen() {
-  const insets     = useSafeAreaInsets();
-  const navigation = useNavigation<Nav>();
-  const route      = useRoute<Route>();
+  const insets        = useSafeAreaInsets();
+  const tabBarHeight  = useBottomTabBarHeight();
+  const navigation    = useNavigation<Nav>();
+  const route         = useRoute<Route>();
   const { prayers, deletePrayer } = usePrayers();
 
   const prayer = prayers.find((p) => p.id === route.params.prayerId);
@@ -83,7 +85,7 @@ export default function PrayerDetailScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + 40 },
+          { paddingBottom: tabBarHeight + spacing.md },
         ]}
         showsVerticalScrollIndicator={false}
       >

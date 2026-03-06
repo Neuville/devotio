@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius } from '../constants/theme';
@@ -23,9 +24,10 @@ type Route = RouteProp<NotebookStackParamList, 'AddEditPrayer'>;
 type Nav   = StackNavigationProp<NotebookStackParamList, 'AddEditPrayer'>;
 
 export default function AddEditPrayerScreen() {
-  const insets     = useSafeAreaInsets();
-  const navigation = useNavigation<Nav>();
-  const route      = useRoute<Route>();
+  const insets       = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+  const navigation   = useNavigation<Nav>();
+  const route        = useRoute<Route>();
   const { prayers, addPrayer, updatePrayer } = usePrayers();
 
   const editingId = route.params?.prayerId;
@@ -112,7 +114,7 @@ export default function AddEditPrayerScreen() {
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: insets.bottom + 40 },
+            { paddingBottom: tabBarHeight + spacing.md },
           ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
